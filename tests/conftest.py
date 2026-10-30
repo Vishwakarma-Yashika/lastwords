@@ -63,19 +63,20 @@ def no_sentry(monkeypatch):
 
 @pytest.fixture
 def fake_ollama(monkeypatch):
-    """Replace ollama.generate; records prompts and returns a scripted reply."""
+    """Replace ollama.chat; records prompts and returns a scripted reply."""
     import ollama
 
     calls: list[dict] = []
     state = {"reply": "I remember."}
 
-    def generate(model, prompt, **kwargs):
+    def chat(model, messages, **kwargs):
+        prompt = messages[-1]["content"]
         calls.append({"model": model, "prompt": prompt})
         reply = state["reply"]
         if isinstance(reply, BaseException):
             raise reply
-        return {"response": reply(prompt) if callable(reply) else reply,
-                "prompt_eval_count": 11, "eval_count": 7}
+        return {"message": {"role": "assistant", "content": reply(prompt) if callable(reply) else reply},
+                "model": model, "prompt_eval_count": 11, "eval_count": 7}
 
-    monkeypatch.setattr(ollama, "generate", generate)
+    monkeypatch.setattr(ollama, "chat", chat)
     return type("FakeOllama", (), {"calls": calls, "state": state})

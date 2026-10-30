@@ -149,6 +149,14 @@ def test_output_path_cannot_be_created(capsys, repo, tmp_path):
 
 # --- success paths are unchanged ------------------------------------------
 
+def test_ask_labels_the_answer_as_a_models_reading(capsys, repo, fake_ollama):
+    fake_ollama.state["reply"] = "I remember."
+    code, out, _ = ask(capsys, repo)
+    assert code == 0
+    assert "Ada Ghost, as gemma2:2b reads their commits: I remember." in out
+    assert "not their own words" in out
+
+
 def test_successful_commands_exit_zero(capsys, repo, fake_ollama, tmp_path):
     assert main(["summon", str(repo.path), "--inactive-days", "30"]) == 0
     assert "ghosts walk this repo" in capsys.readouterr().out

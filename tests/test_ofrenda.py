@@ -150,7 +150,7 @@ def test_pages_are_utf8_and_escape_html(tmp_path, site_ghosts):
 def test_counts_shown_on_pages(tmp_path, site_ghosts):
     out = build_site(site_ghosts, "proj", str(tmp_path / "site"))
     index = (out / "index.html").read_text(encoding="utf-8")
-    assert "12 source lines still alive" in index
+    assert "12 source lines still running" in index
     assert "+ 5 in translation and generated files" in index
     roman = next(p for p in out.glob("ghost-*.html") if "Роман" in p.read_text(encoding="utf-8"))
     assert "5 lines of their work in translation and generated files" in roman.read_text(encoding="utf-8")
@@ -209,3 +209,30 @@ def test_cli_ofrenda_is_deterministic_by_default(make_repo, fake_ollama, tmp_pat
     one = {p.name: p.read_bytes() for p in (tmp_path / "one").iterdir()}
     two = {p.name: p.read_bytes() for p in (tmp_path / "two").iterdir()}
     assert one == two and len(one) == 3
+
+
+def test_pages_thank_without_death_language(tmp_path, site_ghosts):
+    out = build_site(site_ghosts, "proj", str(tmp_path / "site"))
+    for page in out.glob("*.html"):
+        text = page.read_text(encoding="utf-8").lower()
+        assert "mourns no one" in text
+        for word in ["not gone", "rip", "the late", "haunt", "alive", "ghost"]:
+            # page file names may be ghost-<hash>.html; only visible words count
+            visible = re.sub(r'href="[^"]*"', "", text)
+            assert not re.search(rf"\b{word}\b", visible), (page.name, word)
+    index = (out / "index.html").read_text(encoding="utf-8")
+    assert "UNESCO recognised in 2008" in index
+    assert "Ask whoever published this page to remove you" in index
+
+
+def test_opt_out_link(tmp_path, site_ghosts):
+    url = "https://github.com/example/lastwords/issues"
+    out = build_site(site_ghosts[:1], "proj", str(tmp_path / "site"), opt_out_url=url)
+    assert f'<a href="{url}">Ask to be removed</a>' in (out / "index.html").read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("url", ["javascript:alert(1)", "not a url", "https://x y"])
+def test_opt_out_link_must_be_web_or_mail(tmp_path, site_ghosts, url):
+    from lastwords.errors import LastWordsError
+    with pytest.raises(LastWordsError, match="opt-out-url"):
+        build_site(site_ghosts[:1], "proj", str(tmp_path / "site"), opt_out_url=url)

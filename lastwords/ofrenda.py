@@ -135,7 +135,10 @@ def build_site(
     out_dir: str,
     model: str = DEFAULT_MODEL,
     ai_notes: bool = False,
+    opt_out_url: str | None = None,
 ) -> Path:
+    if opt_out_url and not re.match(r"(https?://|mailto:)\S+$", opt_out_url):
+        raise LastWordsError(f"--opt-out-url must be an http(s) or mailto: link, not {opt_out_url}")
     env = Environment(
         loader=FileSystemLoader(TEMPLATES),
         autoescape=select_autoescape(["html"]),
@@ -162,7 +165,7 @@ def build_site(
         pages[f"{slug}.html"] = env.get_template("ghost.html").render(g=entry, ai_notes=ai_notes)
         cards.append(entry)
     pages["index.html"] = env.get_template("index.html").render(
-        cards=cards, repo=repo_name, ai_notes=ai_notes
+        cards=cards, repo=repo_name, ai_notes=ai_notes, opt_out_url=opt_out_url
     )
 
     # pages from an earlier build that this build no longer produces

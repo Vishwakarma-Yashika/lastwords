@@ -70,19 +70,34 @@ def test_ask_sends_transaction_with_child_spans(make_repo, fake_ollama, sentry):
     tx = transactions[0]
     assert tx["transaction"] == "lastwords ask"
     ops = {s["op"] for s in tx["spans"]}
-    assert {"lastwords.blame", "lastwords.history", "lastwords.retrieve"} <= ops
-    retrieve = next(s for s in tx["spans"] if s["op"] == "lastwords.retrieve")
-    assert retrieve["data"]["memories.blamed_included"] is True
+    assert {"lastwords.blame", "lastwords.history"} <= ops
 
     # sentry-sdk 2.66 sends gen_ai.* spans as separate v2 span items in the same trace
     span_items = [s for i in sentry.items() if i.type == "span" for s in i.payload.json["items"]]
-    gen = next(s for s in span_items if s["attributes"]["sentry.op"]["value"] == "gen_ai.text_completion")
+    by_op = {s["attributes"]["sentry.op"]["value"]: s for s in span_items}
+    agent, tool, chat = by_op["gen_ai.invoke_agent"], by_op["gen_ai.execute_tool"], by_op["gen_ai.chat"]
     root = tx["contexts"]["trace"]
-    assert gen["trace_id"] == root["trace_id"]
-    assert gen["parent_span_id"] == root["span_id"]
-    assert gen["attributes"]["gen_ai.request.model"]["value"] == "m"
-    assert gen["attributes"]["gen_ai.system"]["value"] == "ollama"
-    assert gen["attributes"]["gen_ai.usage.output_tokens"]["value"] == 7
+    assert {agent["trace_id"], tool["trace_id"], chat["trace_id"]} == {root["trace_id"]}
+    assert agent["parent_span_id"] == root["span_id"]
+    assert tool["parent_span_id"] == chat["parent_span_id"] == agent["span_id"]
+
+    def attr(span, key):
+        return span["attributes"][key]["value"]
+
+    # the names and attributes Sentry's AI agent views expect
+    assert agent["name"] == "invoke_agent LastWords"
+    assert attr(agent, "gen_ai.operation.name") == "invoke_agent"
+    assert attr(agent, "gen_ai.agent.name") == "LastWords"
+    assert tool["name"] == "execute_tool retrieve_memories"
+    assert attr(tool, "gen_ai.tool.name") == "retrieve_memories"
+    assert attr(tool, "memories.blamed_included") is True
+    assert chat["name"] == "chat m"
+    assert attr(chat, "gen_ai.operation.name") == "chat"
+    assert attr(chat, "gen_ai.provider.name") == "ollama"
+    assert attr(chat, "gen_ai.request.model") == "m"
+    assert attr(chat, "gen_ai.response.model") == "m"
+    assert attr(chat, "gen_ai.usage.input_tokens") == 11
+    assert attr(chat, "gen_ai.usage.output_tokens") == 7
 
 
 def test_private_text_never_leaves(make_repo, fake_ollama, sentry):

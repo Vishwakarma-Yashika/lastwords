@@ -64,10 +64,12 @@ def cmd_ask(args: argparse.Namespace) -> None:
             ghost.commits.append(lone.commits[0])
     print(f"Line {args.line} of {path} was written by {ghost.name} ({sha[:7]}). Summoning...\n")
     answer, memories = ask_ghost(ghost, args.question, args.model, path, blamed_sha=sha)
-    print(f"{ghost.name}: {answer}\n")
+    print(f"{ghost.name}, as {args.model} reads their commits: {answer}\n")
     for m in sorted(memories, key=lambda m: m.when):
         mark = "  <- wrote this line" if m.sha == sha else ""
         print(f"  [{m.sha[:7]}] {m.when.date()}  {m.message.splitlines()[0][:70]}{mark}")
+    if memories:
+        print(f"\nThis is a local model's reading of {ghost.name}'s commits, not their own words.")
 
 
 def cmd_ofrenda(args: argparse.Namespace) -> None:
@@ -79,7 +81,9 @@ def cmd_ofrenda(args: argparse.Namespace) -> None:
         count_surviving_lines(args.repo, authors)
     ghosts = find_ghosts(authors, args.inactive_days)[: args.top]
     name = args.repo.rstrip("/\\").replace("\\", "/").split("/")[-1]
-    out = build_site(ghosts, name, args.out, args.model, ai_notes=args.ai_notes)
+    out = build_site(
+        ghosts, name, args.out, args.model, ai_notes=args.ai_notes, opt_out_url=args.opt_out_url
+    )
     print(f"Lit {len(ghosts)} candles. Open {out / 'index.html'}")
 
 
@@ -111,6 +115,10 @@ def main(argv: list[str] | None = None) -> int:
     o.add_argument(
         "--ai-notes", action="store_true",
         help="experimental: let the local model write each thank-you sentence",
+    )
+    o.add_argument(
+        "--opt-out-url", metavar="URL",
+        help="where someone listed on the site can ask to be removed (http(s) or mailto:)",
     )
     o.set_defaults(func=cmd_ofrenda, command="ofrenda")
 

@@ -9,6 +9,6 @@
 <p><code>{{ g.first.sha[:7] }}</code> {{ g.first.message.splitlines()[0] }}</p>
 <h2>Last words</h2>
 <p><code>{{ g.last.sha[:7] }}</code> {{ g.last.message.splitlines()[0] }}</p>
-<h2>Files they haunt</h2>
+<h2>Files they worked on</h2>
 <ul>{% for f in g.files %}<li><code>{{ f }}</code></li>{% endfor %}</ul>
 {% endblock %}

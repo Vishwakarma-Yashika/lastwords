@@ -139,15 +139,19 @@ def check_citations(text: str, memories: list[CommitRecord]) -> tuple[str, list[
 
 
 def generate(model: str, prompt: str) -> str:
-    """Run the local model, turning Ollama failures into one-line errors."""
+    """Run the local model, turning Ollama failures into one-line errors.
+
+    The span follows Sentry's AI agent conventions (op gen_ai.chat). It records
+    the model and token counts, never the prompt or the reply.
+    """
     attrs = {
-        "gen_ai.system": "ollama",
-        "gen_ai.operation.name": "text_completion",
+        "gen_ai.operation.name": "chat",
+        "gen_ai.provider.name": "ollama",
         "gen_ai.request.model": model,
     }
-    with tracing.span("gen_ai.text_completion", f"text_completion {model}", **attrs) as sp:
+    with tracing.span("gen_ai.chat", f"chat {model}", **attrs) as sp:
         try:
-            reply = ollama.generate(model=model, prompt=prompt)
+            reply = ollama.chat(model=model, messages=[{"role": "user", "content": prompt}])
         except ollama.ResponseError as e:
             if e.status_code == 404:
                 raise LastWordsError(
@@ -166,9 +170,10 @@ def generate(model: str, prompt: str) -> str:
                 "Start the Ollama app, or run: ollama serve"
             ) from None
         if sp:
+            sp.set_data("gen_ai.response.model", reply.get("model") or model)
             sp.set_data("gen_ai.usage.input_tokens", reply.get("prompt_eval_count"))
             sp.set_data("gen_ai.usage.output_tokens", reply.get("eval_count"))
-    return reply["response"].strip()
+    return reply["message"]["content"].strip()
 
 
 def ask_ghost(
@@ -178,15 +183,25 @@ def ask_ghost(
     file: str | None = None,
     blamed_sha: str | None = None,
 ) -> tuple[str, list[CommitRecord]]:
-    with tracing.span("lastwords.retrieve", "retrieve memories") as sp:
-        memories = retrieve(author, question, file, blamed_sha=blamed_sha)
-        if sp:
-            sp.set_data("memories.count", len(memories))
-            sp.set_data("memories.blamed_included", any(m.sha == blamed_sha for m in memories))
-    if not memories:
-        return NO_MEMORY, []
-    answer = generate(model, build_prompt(author, question, memories, blamed_sha))
-    answer, removed = check_citations(answer, memories)
+    agent = {"gen_ai.agent.name": "LastWords"}
+    with tracing.span(
+        "gen_ai.invoke_agent", "invoke_agent LastWords", **agent,
+        **{"gen_ai.operation.name": "invoke_agent"},
+    ) as agent_span:
+        with tracing.span(
+            "gen_ai.execute_tool", "execute_tool retrieve_memories", **agent,
+            **{"gen_ai.operation.name": "execute_tool", "gen_ai.tool.name": "retrieve_memories"},
+        ) as sp:
+            memories = retrieve(author, question, file, blamed_sha=blamed_sha)
+            if sp:
+                sp.set_data("memories.count", len(memories))
+                sp.set_data("memories.blamed_included", any(m.sha == blamed_sha for m in memories))
+        if not memories:
+            return NO_MEMORY, []
+        answer = generate(model, build_prompt(author, question, memories, blamed_sha))
+        answer, removed = check_citations(answer, memories)
+        if agent_span:
+            agent_span.set_data("citations.removed", len(removed))
     if removed:
         answer += (
             f"\n(LastWords removed {len(removed)} citation(s) to commits that were not "

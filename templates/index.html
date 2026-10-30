@@ -7,10 +7,19 @@
 {% for c in cards %}
   <a class="card" href="{{ c.slug }}.html">
     <h2>{{ c.name }}</h2>
-    <div class="dim">{{ c.first.when.year }} – {{ c.last.when.year }}</div>
-    <div>{{ c.lines }} source lines still alive</div>
+    <div class="dim">{% if c.first.when.year == c.last.when.year %}{{ c.first.when.year }}{% else %}{{ c.first.when.year }} – {{ c.last.when.year }}{% endif %}</div>
+    <div>{{ c.lines }} source lines still running</div>
     {% if c.resource_lines %}<div class="dim">+ {{ c.resource_lines }} in translation and generated files</div>{% endif %}
   </a>
 {% endfor %}
 </div>
+<section class="about">
+  <h2>About this ofrenda</h2>
+  <p>An ofrenda is the altar families build for Día de los Muertos, an Indigenous Mexican tradition that UNESCO recognised in 2008, to welcome back the people they have lost. This page borrows only its gratitude. It mourns no one: it thanks people whose code still runs, whatever they are doing now. It is not a Halloween project.</p>
+  {% if opt_out_url %}
+  <p class="dim">Listed here and would rather not be? <a href="{{ opt_out_url }}">Ask to be removed</a> and you will be.</p>
+  {% else %}
+  <p class="dim">Listed here and would rather not be? Ask whoever published this page to remove you.</p>
+  {% endif %}
+</section>
 {% endblock %}

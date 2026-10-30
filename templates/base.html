@@ -23,6 +23,9 @@
   .quote { border-left:3px solid var(--marigold); padding-left:1rem; font-style:italic; }
   code { background:#150d1f; padding:.1rem .35rem; border-radius:4px; color:var(--candle); }
   footer { text-align:center; margin-top:3rem; }
+  .about { max-width:680px; margin:3rem auto 0; background:var(--card); border:1px solid #3a2550; border-radius:10px; padding:1rem 1.4rem; }
+  .about h2 { font-size:.9rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin:0 0 .5rem; }
+  .about p { margin:.5rem 0; }
   @media (prefers-reduced-motion: reduce) { .candle { animation:none; } }
 </style>
 </head>
@@ -30,7 +33,7 @@
 <main>
   <div class="marigolds" aria-hidden="true">✿ ✿ <span class="candle">🕯</span> ✿ ✿</div>
   {% block body %}{% endblock %}
-  <footer class="dim">{% if ai_notes %}The thank-you sentences were written locally by an open-weight model and checked against the commits; the line counts come from git blame.{% else %}Every note quotes a real commit message, and the line counts come from git blame.{% endif %} A "ghost" here only means someone who has not committed in a long time. They are not gone.</footer>
+  <footer class="dim">{% if ai_notes %}The thank-you sentences were written locally by an open-weight model and checked against the commits; the line counts come from git blame.{% else %}Every note quotes a real commit message, and the line counts come from git blame.{% endif %} This page mourns no one: it thanks people whose code still runs, whatever they are doing now.</footer>
 </main>
 </body>
 </html>
