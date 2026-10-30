@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets: Sentry DSNs, API keys, local settings
+.env
+.env.*
+*.dsn
+.sentryclirc
+sentry.properties
+
+# Test and tool caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Temporary files
+*.tmp
+*.log
+*~
+.lastwords-write-test
+
+# Local artifacts that should not be published
+backups/
+site-preview/
+demo-repos/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

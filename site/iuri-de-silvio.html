@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="LastWords">
+<title>Iuri de Silvio · bottle</title>
+<style>
+  :root { --bg:#150d1f; --card:#22142f; --ink:#f4e9d8; --dim:#b8a9c9; --marigold:#ff9f1c; --candle:#ffd166; --rose:#e5446d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:radial-gradient(ellipse at top,#2b1740 0%,var(--bg) 60%); color:var(--ink);
+         font-family:Georgia,'Times New Roman',serif; line-height:1.6; min-height:100vh; }
+  main { max-width:960px; margin:0 auto; padding:2rem 16px 4rem; }
+  a { color:var(--marigold); }
+  h1,h2 { font-weight:normal; letter-spacing:.04em; }
+  .marigolds { text-align:center; font-size:1.6rem; letter-spacing:.5rem; color:var(--marigold); }
+  .candle { display:inline-block; animation:flicker 2.4s infinite alternate; }
+  @keyframes flicker { 0%{opacity:.7;transform:scale(.97)} 100%{opacity:1;transform:scale(1.04)} }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid #3a2550; border-radius:10px; padding:1rem 1.2rem; text-decoration:none; color:var(--ink); }
+  .card:hover { border-color:var(--marigold); }
+  .dim { color:var(--dim); font-size:.9rem; }
+  .quote { border-left:3px solid var(--marigold); padding-left:1rem; font-style:italic; }
+  code { background:#150d1f; padding:.1rem .35rem; border-radius:4px; color:var(--candle); }
+  footer { text-align:center; margin-top:3rem; }
+  @media (prefers-reduced-motion: reduce) { .candle { animation:none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="marigolds" aria-hidden="true">✿ ✿ <span class="candle">🕯</span> ✿ ✿</div>
+<p><a href="index.html">← back to the ofrenda</a></p>
+<h1>Iuri de Silvio</h1>
+<p class="dim">2011-06-09 to 2013-10-02 · 25 commits · 44 source lines still running</p>
+<p class="quote">Thank you, Iuri de Silvio, for “Stressing encoding definition. I swear I found these bugs by accident.” 44 lines of their source code still run in bottle today.</p>
+<h2>First words</h2>
+<p><code>fcad368</code> Solving #164 documentation bug.</p>
+<h2>Last words</h2>
+<p><code>22c3aeb</code> Fix static route rule in tutorial</p>
+<h2>Files they haunt</h2>
+<ul><li><code>bottle.py</code></li><li><code>docs/tutorial.rst</code></li><li><code>test/test_stpl.py</code></li><li><code>test/test_router.py</code></li><li><code>docs/routing.rst</code></li></ul>
+  <footer class="dim">Every note quotes a real commit message, and the line counts come from git blame. A "ghost" here only means someone who has not committed in a long time. They are not gone.</footer>
+</main>
+</body>
+</html>

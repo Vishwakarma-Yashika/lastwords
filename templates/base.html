@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="LastWords">
+<title>{% block title %}LastWords{% endblock %}</title>
+<style>
+  :root { --bg:#150d1f; --card:#22142f; --ink:#f4e9d8; --dim:#b8a9c9; --marigold:#ff9f1c; --candle:#ffd166; --rose:#e5446d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:radial-gradient(ellipse at top,#2b1740 0%,var(--bg) 60%); color:var(--ink);
+         font-family:Georgia,'Times New Roman',serif; line-height:1.6; min-height:100vh; }
+  main { max-width:960px; margin:0 auto; padding:2rem 16px 4rem; }
+  a { color:var(--marigold); }
+  h1,h2 { font-weight:normal; letter-spacing:.04em; }
+  .marigolds { text-align:center; font-size:1.6rem; letter-spacing:.5rem; color:var(--marigold); }
+  .candle { display:inline-block; animation:flicker 2.4s infinite alternate; }
+  @keyframes flicker { 0%{opacity:.7;transform:scale(.97)} 100%{opacity:1;transform:scale(1.04)} }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid #3a2550; border-radius:10px; padding:1rem 1.2rem; text-decoration:none; color:var(--ink); }
+  .card:hover { border-color:var(--marigold); }
+  .dim { color:var(--dim); font-size:.9rem; }
+  .quote { border-left:3px solid var(--marigold); padding-left:1rem; font-style:italic; }
+  code { background:#150d1f; padding:.1rem .35rem; border-radius:4px; color:var(--candle); }
+  footer { text-align:center; margin-top:3rem; }
+  @media (prefers-reduced-motion: reduce) { .candle { animation:none; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="marigolds" aria-hidden="true">✿ ✿ <span class="candle">🕯</span> ✿ ✿</div>
+  {% block body %}{% endblock %}
+  <footer class="dim">{% if ai_notes %}The thank-you sentences were written locally by an open-weight model and checked against the commits; the line counts come from git blame.{% else %}Every note quotes a real commit message, and the line counts come from git blame.{% endif %} A "ghost" here only means someone who has not committed in a long time. They are not gone.</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ g.name }} · {{ g.repo }}{% endblock %}
+{% block body %}
+<p><a href="index.html">← back to the ofrenda</a></p>
+<h1>{{ g.name }}</h1>
+<p class="dim">{{ g.first.when.date() }} to {{ g.last.when.date() }} · {{ g.commits }} commits · {{ g.lines }} source lines still running{% if g.resource_lines %} · {{ g.resource_lines }} lines in translation and generated files{% endif %}</p>
+<p class="quote">{{ g.text }}</p>
+<h2>First words</h2>
+<p><code>{{ g.first.sha[:7] }}</code> {{ g.first.message.splitlines()[0] }}</p>
+<h2>Last words</h2>
+<p><code>{{ g.last.sha[:7] }}</code> {{ g.last.message.splitlines()[0] }}</p>
+<h2>Files they haunt</h2>
+<ul>{% for f in g.files %}<li><code>{{ f }}</code></li>{% endfor %}</ul>
+{% endblock %}

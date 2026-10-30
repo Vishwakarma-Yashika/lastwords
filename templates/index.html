@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Ofrenda for {{ repo }}{% endblock %}
+{% block body %}
+<h1>Ofrenda for {{ repo }}</h1>
+<p class="dim">The people whose work still runs here, long after their last commit.</p>
+<div class="grid">
+{% for c in cards %}
+  <a class="card" href="{{ c.slug }}.html">
+    <h2>{{ c.name }}</h2>
+    <div class="dim">{{ c.first.when.year }} – {{ c.last.when.year }}</div>
+    <div>{{ c.lines }} source lines still alive</div>
+    {% if c.resource_lines %}<div class="dim">+ {{ c.resource_lines }} in translation and generated files</div>{% endif %}
+  </a>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+# Runtime dependencies of LastWords, pinned to the versions the test suite was run with.
+# Ollama itself and the Gemma model are installed separately (see README).
+GitPython==3.2.1
+Jinja2==3.1.6
+ollama==0.6.1
+httpx==0.28.1
+sentry-sdk==2.66.1
